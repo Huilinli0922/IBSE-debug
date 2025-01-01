@@ -29,12 +29,12 @@ function operators = updateOP(boundary_data, boundary_condition, operators)
     T_1_old, T_2_old, T_3_old, R_1_old, R_2_old, R_3_old, B_old] ...
                                      = operators{:};
 
-[X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO] = boundary_data{:};
+[X, Y, nx, ny,  XE, XO] = boundary_data{:};
 % gamma length and wall length
-nbdy = length(X); nwall = length(Xw1); N = sqrt(length(XO));
+nbdy = length(X); N = sqrt(length(XO));
 
 % old length of nbdy
-nbdy_old = size(S_old, 2) - 2*nwall;
+nbdy_old = size(S_old, 2);
 
 % preallot space for all the operators
 S = sparse(N^2, length(X)); 
@@ -87,31 +87,28 @@ ST = TT0';                                  % S^* on Gamma
 TT = [TT0 TT1 TT2 TT3]';                    % T^* on Gamma
 
 
-S = [S S_old(:,nbdy_old+1:end)]; ST = [ST; ST_old(nbdy_old+1:end,:)];     % put S, S^* together
-T = [T T_old(:,nbdy_old+1:end)]; TT = [TT; TT_old(nbdy_old+1:end,:)];     % put T, T^* together
-
 
 % Sn and STn are the S and S^* for Dirichlet on Gamma and Neumann on walls,
 %             this is the case for the thermal and mass diffusion study
-Sn = sparse([S Sn_old(:,nbdy_old+1:end)]); 
-STn = sparse([ST; STn_old(nbdy_old+1:end,:)]);
+Sn = sparse(S); 
+STn = sparse(ST);
 
 
 % normal derivative operator, something useful
-normD = sparse([TT1'; normD_old(nbdy_old+1:end,:)]);
+normD = sparse(TT1');
 
 % get boundary condtion operators
 B_0 = a0*TT0'+ b0*TT1'; 
-B = sparse([B_0; B_old(nbdy_old+1:end,:)]);
+B = sparse(B_0);
 
 
 % T_k and R_k are T and R for IBSE k method
-T_1 = T(:,[1:2*nbdy 4*nbdy+1:4*nbdy+2*nwall  4*nbdy+4*nwall+1:4*nbdy+6*nwall]);
-T_2 = T(:,[1:3*nbdy 4*nbdy+1:4*nbdy+3*nwall  4*nbdy+4*nwall+1:4*nbdy+7*nwall]);
+T_1 = T(:,1:2*nbdy);
+T_2 = T(:,1:3*nbdy);
 T_3 = T;
-R_1 = TT([nbdy+1:nbdy*2 (4*nbdy+nwall+1):(4*nbdy+2*nwall) (4*nbdy+5*nwall+1):(4*nbdy+6*nwall)], :);
-R_2 = TT([nbdy+1:nbdy*3 (4*nbdy+nwall+1):(4*nbdy+3*nwall) (4*nbdy+5*nwall+1):(4*nbdy+7*nwall)], :);
-R_3 = TT([nbdy+1:nbdy*4 (4*nbdy+nwall+1):(4*nbdy+4*nwall) (4*nbdy+5*nwall+1):(4*nbdy+8*nwall)], :);
+R_1 = TT(nbdy+1:nbdy*2, :);
+R_2 = TT(nbdy+1:nbdy*3, :);
+R_3 = TT(nbdy+1:nbdy*4, :);
 
 
 % collect all the operators

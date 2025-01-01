@@ -23,11 +23,11 @@ function [u, v, p, iter_u] = GMRES_VPSolver(boundary_data, ...
 %            iter_u       - number of iterations in gmres
 %
 
-[u_gamma, v_gamma, u_w1, v_w1, u_w2, v_w2] = boundary_condition_uv{:};
-u_BC = [u_gamma; u_w1; u_w2]; v_BC = [v_gamma; v_w1; v_w2];
+[u_gamma, v_gamma] = boundary_condition_uv{:};
+u_BC = [u_gamma]; v_BC = [v_gamma];
 
 % grab all the data
-[X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO] = boundary_data{:};
+[X, Y, nx, ny, XE, XO] = boundary_data{:};
 [Laplacian, invLaplacian, Helmholtz_Op, inv_Helmholtz_Op, inv_H, N, sigma,...
     IBSEk, dx, dy, inv_dx, inv_dy, inv_H_lower, inv_H_higher] ...
     = diff_operators{:};
@@ -35,11 +35,11 @@ u_BC = [u_gamma; u_w1; u_w2]; v_BC = [v_gamma; v_w1; v_w2];
     = operators{:};
 
 % get all the length
-nbdy = length(X); nwall = length(Xw1); N = sqrt(length(XO));
+nbdy = length(X);  N = sqrt(length(XO));
 
 % get lower order TT
-TT_1 = TT([1:2*nbdy 4*nbdy+1:4*nbdy+2*nwall  4*nbdy+4*nwall+1:4*nbdy+6*nwall],:);
-TT_2 = TT([1:3*nbdy 4*nbdy+1:4*nbdy+3*nwall  4*nbdy+4*nwall+1:4*nbdy+7*nwall],:);
+TT_1 = TT(1:2*nbdy,:);
+TT_2 = TT(1:3*nbdy,:);
 
 % detect the order of method
 if  IBSEk ==1

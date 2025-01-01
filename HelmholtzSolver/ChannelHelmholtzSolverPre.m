@@ -18,13 +18,13 @@ function SC = ...
 %
 
 % grab all the data
-[X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO] = boundary_data{:};
+[X, Y, nx, ny, XE, XO] = boundary_data{:};
 [Laplacian, invLaplacian, Helmholtz_Op, inv_Helmholtz_Op, inv_H, N, sigma, IBSEk] ...
                     = diff_operators{:};
 [Sn, normD, S, ST, STn, T, TT, T_1, T_2, T_3, R_1, R_2, R_3, B] ...
                     = operators{:};
                 
-XE_all = 1-XO; nbdy = length(X); nwall = length(Xw1);
+XE_all = 1-XO; nbdy = length(X); 
 if IBSEk == 1
     Tn = T_1; R = R_1;
 elseif IBSEk == 2
@@ -45,11 +45,11 @@ parfor k = 1:length_F
     xi = operator(Tn*F, inv_H); 
     op_xi = XE_all.*operator(xi, Helmholtz_Op);
     u = operator( op_xi, inv_Helmholtz_Op);
-    SC(:,k) = [R*(u-xi); B*u; sum(op_xi)/(nbdy+2*nwall)^2];
+    SC(:,k) = [R*(u-xi); B*u; sum(op_xi)/(nbdy)^2];
 end
 
 % if sigma = 0 (Poisson eqn), special cares need to be taken
-SC(:,end) = [ zeros(size(R,1) + size(B,1) - (nbdy+nwall*2),1); ones(nbdy+nwall*2,1); 0]/(nbdy+2*nwall);
+SC(:,end) = [ zeros(size(R,1) + size(B,1) - (nbdy),1); ones(nbdy,1); 0]/(nbdy);
 if sigma
     SC = SC(1:end-1,1:end-1);
 end

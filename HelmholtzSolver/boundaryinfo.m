@@ -1,4 +1,4 @@
-function boundary_data = boundaryinfo(theta, L, x0, y0, x, y, gamma, nwall)
+function boundary_data = boundaryinfo(theta, L, x0, y0, x, y, gamma)
 %	boundaryinfo     get boundary information
 %
 %       J. Mac Huang, 06/18/2016
@@ -34,12 +34,6 @@ s = (0:N-1)'/N; dS = L/N+0*s;
 % extend domain to accomodate for periodic boundary conditions
 [x_e,y_e] = meshgrid(((-Nx+1):(2*Nx))/Nx*2*pi, (1:Nx)/Nx*2*pi);
 x_e = x_e(:); y_e = y_e(:);
-
-
-% define the node location of all walls, and boundary Gamma
-Xw1 = (1:nwall)'/nwall *2*pi; Xw2 = Xw1;
-Yw1 = 0*Xw1 + pi-pi/gamma;
-Yw2 = 0*Xw2 + pi+pi/gamma;
 
 x0_np = x0;         % keep a record of nonperiodic value of x0
 x0 = mod(x0, 2*pi);
@@ -119,15 +113,15 @@ parfor j = 1:length(x_e)
         % side is 1 in XE, 0 otherwise
         
         % uncomment here if you want to smooth the XE
-        XE(j) = wendland_2(n, dist/dx*side);
+        % XE(j) = wendland_2(n, dist/dx*side);
         
         
          % uncomment here if you don't want to smooth the XE
-        %if side >0
-        %    XE(j) = 1;
-        %else
-        %   XE(j) = 0;
-        %end
+        if side >0
+           XE(j) = 1;
+        else
+          XE(j) = 0;
+        end
     end
 end
 
@@ -143,10 +137,9 @@ XE = XE(:,1:Nx) + XE(:,Nx+1:2*Nx) + XE(:,2*Nx+1:3*Nx); XE = XE(:);
 % XEw = wendland_2(n, (y-(pi+pi/gamma))/dx) + wendland_2(n, (-y+(pi-pi/gamma))/dx) ;
 
 % uncomment here if you don't want to smooth the XEw
-XEw = (y>=(pi+pi/gamma))+(y<=(pi-pi/gamma));
 
 % indicator for physical domain
-XO = (1-XE).*(1-XEw);
+XO = (1-XE);
 
 X_np = X;           % keep a nonperiodic X for plotting
 
@@ -157,6 +150,6 @@ X = mod(X, 2*pi);
 
 
 
-boundary_data = {X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO, ...
+boundary_data = {X, Y, nx, ny, XE, XO, ...
     theta, L, L, x0_np, y0, x, y, gamma, X_np, S0};
 end

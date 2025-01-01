@@ -24,7 +24,7 @@ function [boundary_data, V_data, renewflag] = ...
 %
 
 % grab all the data
-[X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO,...
+[X, Y, nx, ny, XE, XO,...
     theta, L, L_old, x0, y0, x, y, gamma, ~] = boundary_data{:};
 [Vtheta, VL, Vn_anchor, a_ice_old, u_ice_old] = V_data{:};
 
@@ -34,7 +34,7 @@ Vx_old = Vn_anchor*nx(1)+u_ice_old;  Vy_old = Vn_anchor*ny(1);
 L_oldold= L_old; L_old = L;
 
 % get all the vector length
-nbdy = length(X); nwall = length(Xw1); N = sqrt(length(XO));
+nbdy = length(X);  N = sqrt(length(XO));
 
 % define arclength coordinate and mean-free theta value
 s= (0:nbdy-1)'/nbdy;
@@ -82,8 +82,8 @@ theta_mf = gaussianF( theta_mf, gSigma1 ) + dt/2*(3*N1-N2);
 theta = theta_mf - 2*pi*s;
 
 % gegenerate the boundary data, keep a record of L_old
-boundary_data = boundaryinfo(theta, L, x0, y0, x, y, gamma, nwall);
-boundary_data{14} = L_old;
+boundary_data = boundaryinfo(theta, L, x0, y0, x, y, gamma);
+boundary_data{9} = L_old;
 
 % save all the boundary velocity data
 V_data = {Vtheta, VL, Vn_anchor, a_ice, u_ice, Vn};

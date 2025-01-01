@@ -15,7 +15,6 @@ location = 2;                           % 0 cims server, 1 E605, 2 Tiffany,
                                         % nyush_tiff, 
 
 N = 256;                                % node number in x and y direction
-dt = 1e-6;                              % time step
 alpha = pi/6;                           % inclination angle
 disp(['alpha=' num2str(round(alpha*180/pi))])
 T_infty = 10;                           % ambient temp
@@ -24,7 +23,7 @@ save_skip = 200;                       % save every # time steps
 disk_save_int = 1000*save_skip;%1000      % how many steps until disk save
 disk_save_int2 = 1000; %100000
 renew_step=[];
-hold_step=10;
+hold_step = 100;
 
 % Add path, prepare everything
 addpath('./SolverFunctions', './HelmholtzSolver', ...
@@ -33,14 +32,20 @@ addpath('./SolverFunctions', './HelmholtzSolver', ...
 
 server_plot_save_setup                  % prepare plot and save
 parameter_initialize                    % other variable + exp parameter
+
+dt = 0.001/sqrt(Ra);                              % time step
+% dt = 0.002/sqrt(Ra); 
+
 solver_preparation                      % prepare shape and operators
+
+
 
 %% main loop
 while L/L0 > endFraction
 
     [boundary_data, V_data, renewflag1] = ...
         updateBoundary(boundary_data, V_data, Vn, a_ice, epsilon, dt);
-    [X, Y, nx, ny, ~, ~, ~, ~, XE, XEw, XO,...
+    [X, Y, nx, ny, XE, XO,...
         theta, L, ~, x0, y0, ~, ~, ~, X_np,S0] = boundary_data{:};
 
     u_ice = V_data{5};                  % ice moving velocity
@@ -56,11 +61,10 @@ while L/L0 > endFraction
 
     % define the new boundary conditions
     nbdy = length(X); g = zeros(nbdy,1);
-    gw1 = zeros(nwall,1); gw2 = gw1;
     u_BC = u_ice + Vn.*nx; 
     v_BC = Vn.*ny;
-    boundary_condition_T = {1, 0, g+c_ice, 0, 1, gw1, 0, 1, gw2};
-    boundary_condition_uv = {u_BC, v_BC, gw1, gw1, gw2, gw2};
+    boundary_condition_T = {1, 0, g+c_ice};
+    boundary_condition_uv = {u_BC, v_BC};
 
     % update the oprators
     operators = getOP(boundary_data, boundary_condition_T, N);
@@ -88,7 +92,7 @@ while L/L0 > endFraction
     % coldold, uoldold, voldold, B_*_old, Cold at (n-2) step
 
     % solve for the concentration/temperature field
-    C = advective(N, u, v, c) + f.*c;   % C at (n-1) step
+    C = advective(N, u, v, c) + f.*(c - c_wall);   % C at (n-1) step
     RHST = ABBD2(dt,0, C, Cold, cold, coldold, ifstart);
     [c, iter_c] = GMRES_HelmholtzSolver(boundary_data, ...
         boundary_condition_T, diff_operators_T, operators, RHST, SC, gmres_tol);
@@ -120,12 +124,10 @@ while L/L0 > endFraction
     % wall_p_down = mean(surf_p(end-2*nwall+1:end-nwall));
     % 
     % % pressure gradient vertically
-    % p_grad = (wall_p_down - wall_p_up)/(Yw2(1)-Yw1(1));
+    % p_grad = (wall_p_down - wall_p_up)/(Yw2(1)-Yw1(1)); p_grad
     % 
     % % make surf_p gradient free and mean free
-    % surf_p = surf_p(1:nbdy) + p_grad*Y; surf_p = surf_p - mean(surf_p); 
-
-    surf_p = surf_p(1:nbdy); surf_p = surf_p - mean(surf_p); 
+    % surf_p = surf_p(1:nbdy) + p_grad*Y; surf_p = surf_p - mean(surf_p);
 
     % calc stress tensor
     surf_tau = Pr*(ST*(operator(u,dy)+operator(v,dx)));

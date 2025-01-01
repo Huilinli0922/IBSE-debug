@@ -22,13 +22,13 @@ function [u, iter_u] = GMRES_HelmholtzSolver(boundary_data, ...
 %
 
 % grab all the data
-[X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO] = boundary_data{:};
+[X, Y, nx, ny, XE, XO] = boundary_data{:};
 [Laplacian, invLaplacian, Helmholtz_Op, ...
     inv_Helmholtz_Op, inv_H, N, sigma, IBSEk] = diff_operators{:};
 [Sn, normD, S, ST, STn, T, TT, T_1, T_2, T_3, R_1, R_2, R_3, B] ...
     = operators{:};
-[a0, b0, g0, a_w1, b_w1, g_w1, a_w2, b_w2, g_w2] = boundary_condition{:};
-g = [g0; g_w1; g_w2];
+[a0, b0, g0] = boundary_condition{:};
+g = g0;
 
 
 if IBSEk == 1

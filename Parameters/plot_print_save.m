@@ -9,7 +9,7 @@ if ifprint
     disp( ['    GMRES converged with ' num2str(max(iter_c(2),iter_u(2))) ...
         ' iterations'])
     disp( ['  timestep ' num2str(k) ', remaining length L/L_0= ' ...
-        num2str(boundary_data{13}/L0*100, '%.2f') ' %'])
+        num2str(boundary_data{8}/L0*100, '%.2f') ' %'])
 else
 end
 
@@ -30,11 +30,11 @@ if ifplot
         colorbar
         hold on
         plot([X_np; X_np(1)],[Y; Y(1)], 'color', [0.3010 0.7450 0.9330], ...
-            'lineWidth',4)
+            'lineWidth',2)
         plot([X_np; X_np(1)]-2*pi,[Y; Y(1)], 'color', [0.3010 0.7450 0.9330], ...
-            'lineWidth',4)
+            'lineWidth',2)
         plot([X_np; X_np(1)]+2*pi,[Y; Y(1)], 'color', [0.3010 0.7450 0.9330], ...
-            'lineWidth',4)
+            'lineWidth',2)
         hold on
 
         if plotpressure
@@ -53,11 +53,11 @@ if ifplot
         %plot([0; 2*pi], 0*[0; 2*pi] + pi-pi/gamma, 'k', 'lineWidth',2 )
         %plot([0; 2*pi], 0*[0; 2*pi] + pi+pi/gamma, 'k', 'lineWidth',2 )
         axis equal
-        axis([0,2*pi, Yw1(1),(pi+pi/gamma)])
+        %axis([0,2*pi, y_lower,y_upper])
         axis off
-        title(['current time: ' num2str(tt*tau/60, '%.4f') 'min, f_x= '...
-            num2str(f_x, '%.4f') ', L/L_0= ' ...
-            num2str(boundary_data{13}/L0*100, '%.2f') ' %'], 'FontSize', font_size)
+        title(['current time: ' num2str(tt*tau/60, '%.2f') ' min, f_x= '...
+            num2str(f_x, '%.2e') ', L/L_0= ' ...
+            num2str(boundary_data{8}/L0*100, '%.2f') ' %'], 'FontSize', font_size)
         drawnow
         writegif(gifname , pp_plot , 30, 1 )
         pp_plot = pp_plot+1;

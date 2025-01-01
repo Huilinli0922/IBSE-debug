@@ -2,7 +2,7 @@
 
 % Initial shape
 % initialize boundary geometry
-x0 = 1.5; y0 = pi+1.5;                     % physical location of s=0
+x0 = pi; y0 = pi+1/2;                     % physical location of s=0
 l0 = 1/sin(alpha); L0 = (l0+1+1/tan(alpha))*height_ratio;
 
 % compute the number of grid points for candy boat
@@ -17,16 +17,21 @@ s = (0:nbdy-1)'/nbdy;
 
 
 % define boundary conditions
-g = zeros(nbdy,1); gw1 = zeros(nwall,1); gw2 = gw1;
+g = zeros(nbdy,1); 
 c_wall=(T_infty-T_star)/(T_infty-T0);
 c_ice=(T0-T_star)/(T_infty-T0);
 
-boundary_condition_T = {1, 0, g+c_ice, 0, 1, gw1, 0, 1, gw2};
-boundary_condition_uv = {g, g, gw1, gw1, gw2, gw2};
+boundary_condition_T = {1, 0, g+c_ice};
+boundary_condition_uv = {g, g};
 
 % define cartesian coordinates for the domain and boundaries
 [x,y] = meshgrid((1:N)/N*2*pi);
 x = x(:); y = y(:);
+
+
+% define damping mask
+[f, y_lower, y_upper] = damping_mask(y, y_lower, y_upper, width);
+f = damp_strength*f;
 
 %% Preprocessing stage
 % define sigma in the Helmholtz eqns
@@ -36,8 +41,8 @@ sigma_u = (2/3*dt*nu);
 sigma_T = (2/3*dt*diffusivity);
 
 % generate all boundary data
-boundary_data = boundaryinfo(theta, L, x0, y0, x, y, gamma, nwall);
-[X, Y, nx, ny, Xw1, Yw1, Xw2, Yw2, XE, XEw, XO,S0] = boundary_data{:};
+boundary_data = boundaryinfo(theta, L, x0, y0, x, y, gamma);
+[X, Y, nx, ny, XE, XO, S0] = boundary_data{:};
 m_ice = lambda*S0;
 
 % differential operators
@@ -58,8 +63,6 @@ Cold = C; Coldold = Cold;
 B_u_old = B_u; B_u_oldold = B_u_old;
 B_v_old = B_v; B_v_oldold = B_v_old;
 
-% define damping function f
-[f, Yw1_new] = damping_mask(boundary_data, damping_strength, damping_size);
 
 % initialize all shape related variables
 nbdy0 = nbdy; L0 = L;

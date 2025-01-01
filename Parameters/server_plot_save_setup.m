@@ -8,12 +8,12 @@ if location == 0
     ifvisible = 0;
 elseif location == 1
     server = 'office';
-    cores = 48;
-    workingFolder = '~/Scratch/iceboat';
+    cores = 8;
+    workingFolder = '/home/machuang/Scratch/iceboat';
     ifvisible = 1;
 elseif location == 2
     server = 'tiffany';
-    cores = 3;
+    cores = 2;
     workingFolder = 'data/';
     ifvisible = 1;
 elseif location == 3
@@ -46,12 +46,12 @@ ifprint =1;                             % whether to print
 ifplot = 1;                             % whether to plot
 ifmovie = 0;                            % whether to generate mp4 movie
 %     Note: requires FFMPEG
-plotint = 10;                           % skip of plot
+plotint = 40;                           % skip of plot
 mkmovint =30;                         % skip of making movie
 hidpi = 0;                              % whether the display is hidpi
 %     Note: set to 0 on server
 
-plotpressure=1;
+plotpressure=0;
 plotshear=0;
 
 % path for gif and mp4 movies
@@ -67,7 +67,7 @@ if ifplot
     if ~ifvisible
         set(Fig,'visible','off');
     end
-    set(Fig, 'Position', [1 1 800 800])
+    set(Fig, 'Position', [1 1 600 600])
     if hidpi
         font_size = 16*settings().matlab.desktop.DisplayScaleFactor.PersonalValue;
     else

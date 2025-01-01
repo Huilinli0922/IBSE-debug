@@ -21,18 +21,22 @@ rho_ice = 917;                     % density of ice at 0
 Pr = k_viscosity/kt;                                     % Prandtl 
 Ra = gravity*beta*(T_infty-T0)^2*H^3/(k_viscosity*kt);   % Rayleigh 
 St = Cp*(T_infty-T0)/Latent;                             % Stefan
-lambda = rho_ice/rho_star*10;                           % dimensionless density
-% lambda = 4;
+lambda = rho_ice/rho_star;                           % dimensionless density
+lambda = 9;
+lambda = rho_ice/rho_star*10;
 
 % Solver parameters
-nwall = N/2;                      % size of the wall
 gamma = 4/3;                      % aspect ratio of physical domain
 q = 0.0;                          % concentration depletion coeff.
 endFraction = 0.1;                % smallest possible size (for shrinking)
 gmres_tol = 1e-6;                 % tolerance for the GMRES
-iter_max = 8;                    % max GMRES iterations for SC to renew
+iter_max = 10;                    % max GMRES iterations for SC to renew
 epsilon = .03;                   % Gibbs Thomson effect
 damping_strength = 0;             % how strong the damping is
 damping_size = 0.8;               % how wide the damping is
 
+% damping mask
+width = 1;
+y_lower = width*1.2; y_upper = 2*pi - width*1.2;
+damp_strength = 400;
 
